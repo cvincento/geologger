@@ -260,7 +260,7 @@ function deg2rad(deg) { return deg * (Math.PI/180) }
 // --- Event Logging ---
 function logEvent(event) {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}:${now.getMilliseconds().toString().padStart(3, '0')}`;
     const dateString = now.toLocaleDateString('en-US');
     const selectedStation = stationSelect.value;
 
