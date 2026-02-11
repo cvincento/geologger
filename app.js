@@ -157,7 +157,11 @@ const doorCloseBtn = document.getElementById('door-close');
 const concourseWalkBtn = document.getElementById('concourse-walk');
 const historyList = document.getElementById('history-list');
 const gpsStatus = document.getElementById('gps-status');
-const langSelect = document.getElementById('lang-select');
+const translations = {
+    "Door Open": { en: "Door Open", zh: "開門" },
+    "Door Close": { en: "Door Close", zh: "關門" },
+    "Concourse Walk": { en: "Concourse Walk", zh: "大堂行走" }
+};
 
 let history = JSON.parse(localStorage.getItem('mtr_history')) || [];
 let currentLang = 'en';
@@ -312,7 +316,7 @@ function renderHistory() {
             <div class="flex-1">
                 <div class="text-xs text-gray-400 mb-1">${log.date} ${log.time}</div>
                 <div class="font-bold text-gray-800 text-lg">
-                    ${log.station[currentLang]} - ${log.event}
+                    ${log.station[currentLang]} - ${translations[log.event][currentLang]}
                 </div>
                 <div class="text-sm text-gray-600">
                     Location: ${log.location}
@@ -345,7 +349,7 @@ function downloadCSV() {
             log.date,
             log.time,
             log.station[currentLang],
-            log.event,
+            translations[log.event][currentLang],
             `"${log.location}"`
         ].join(",");
         csvContent += row + "\n";
