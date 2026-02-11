@@ -27,7 +27,6 @@ const stationCoords = {
 };
 
 const mtrLines = {
-    "常用": { en: "Common", zh: "常用" },
     "港島綫": { en: "Island Line", zh: "港島綫" },
     "荃灣綫": { en: "Tsuen Wan Line", zh: "荃灣綫" },
     "觀塘綫": { en: "Kwun Tong Line", zh: "觀塘綫" },
@@ -36,40 +35,121 @@ const mtrLines = {
     "東涌綫": { en: "Tung Chung Line", zh: "東涌綫" }
 };
 
-const langSelect = document.getElementById('lang-select');
-
-langSelect.addEventListener('change', (event) => {
-    setLanguage(event.target.value);
-});
-
-function setLanguage(lang) {
-    document.querySelectorAll('[data-en]').forEach(el => {
-        el.textContent = el.dataset[lang];
-    });
-    updateStationSelect(lang);
-}
-
-function updateStationSelect(lang) {
-    const selectedLine = stationSelect.value;
-    stationSelect.innerHTML = '';
-    for (const [line, names] of Object.entries(mtrLines)) {
-        const group = document.createElement('optgroup');
-        group.label = names[lang];
-        // This part needs to be updated to handle station names in different languages
-        // For now, we'll just use the Chinese names
-        const stations = mtrStations[line];
-        if (stations) {
-            stations.forEach(station => {
-                const option = document.createElement('option');
-                option.value = station;
-                option.textContent = station;
-                group.appendChild(option);
-            });
-        }
-        stationSelect.appendChild(group);
+const mtrStations = {
+    "港島綫": {
+        "堅尼地城": { en: "Kennedy Town", zh: "堅尼地城" },
+        "香港大學": { en: "HKU", zh: "香港大學" },
+        "西營盤": { en: "Sai Ying Pun", zh: "西營盤" },
+        "上環": { en: "Sheung Wan", zh: "上環" },
+        "中環": { en: "Central", zh: "中環" },
+        "金鐘": { en: "Admiralty", zh: "金鐘" },
+        "灣仔": { en: "Wan Chai", zh: "灣仔" },
+        "銅鑼灣": { en: "Causeway Bay", zh: "銅鑼灣" },
+        "天后": { en: "Tin Hau", zh: "天后" },
+        "炮台山": { en: "Fortress Hill", zh: "炮台山" },
+        "北角": { en: "North Point", zh: "北角" },
+        "鰂魚涌": { en: "Quarry Bay", zh: "鰂魚涌" },
+        "太古": { en: "Tai Koo", zh: "太古" },
+        "西灣河": { en: "Sai Wan Ho", zh: "西灣河" },
+        "筲箕灣": { en: "Shau Kei Wan", zh: "筲箕灣" },
+        "杏花邨": { en: "Heng Fa Chuen", zh: "杏花邨" },
+        "柴灣": { en: "Chai Wan", zh: "柴灣" }
+    },
+    "荃灣綫": {
+        "中環": { en: "Central", zh: "中環" },
+        "金鐘": { en: "Admiralty", zh: "金鐘" },
+        "尖沙咀": { en: "Tsim Sha Tsui", zh: "尖沙咀" },
+        "佐敦": { en: "Jordan", zh: "佐敦" },
+        "油麻地": { en: "Yau Ma Tei", zh: "油麻地" },
+        "旺角": { en: "Mong Kok", zh: "旺角" },
+        "太子": { en: "Prince Edward", zh: "太子" },
+        "深水埗": { en: "Sham Shui Po", zh: "深水埗" },
+        "長沙灣": { en: "Cheung Sha Wan", zh: "長沙灣" },
+        "荔枝角": { en: "Lai Chi Kok", zh: "荔枝角" },
+        "美孚": { en: "Mei Foo", zh: "美孚" },
+        "荔景": { en: "Lai King", zh: "荔景" },
+        "葵芳": { en: "Kwai Fong", zh: "葵芳" },
+        "葵興": { en: "Kwai Hing", zh: "葵興" },
+        "大窩口": { en: "Tai Wo Hau", zh: "大窩口" },
+        "荃灣": { en: "Tsuen Wan", zh: "荃灣" }
+    },
+    "觀塘綫": {
+        "黃埔": { en: "Whampoa", zh: "黃埔" },
+        "何文田": { en: "Ho Man Tin", zh: "何文田" },
+        "油麻地": { en: "Yau Ma Tei", zh: "油麻地" },
+        "旺角": { en: "Mong Kok", zh: "旺角" },
+        "太子": { en: "Prince Edward", zh: "太子" },
+        "石硤尾": { en: "Shek Kip Mei", zh: "石硤尾" },
+        "九龍塘": { en: "Kowloon Tong", zh: "九龍塘" },
+        "樂富": { en: "Lok Fu", zh: "樂富" },
+        "黃大仙": { en: "Wong Tai Sin", zh: "黃大仙" },
+        "鑽石山": { en: "Diamond Hill", zh: "鑽石山" },
+        "彩虹": { en: "Choi Hung", zh: "彩虹" },
+        "九龍灣": { en: "Kowloon Bay", zh: "九龍灣" },
+        "牛頭角": { en: "Ngau Tau Kok", zh: "牛頭角" },
+        "觀塘": { en: "Kwun Tong", zh: "觀塘" },
+        "藍田": { en: "Lam Tin", zh: "藍田" },
+        "油塘": { en: "Yau Tong", zh: "油塘" },
+        "調景嶺": { en: "Tiu Keng Leng", zh: "調景嶺" }
+    },
+    "東鐵綫": {
+        "金鐘": { en: "Admiralty", zh: "金鐘" },
+        "會展": { en: "Exhibition Centre", zh: "會展" },
+        "紅磡": { en: "Hung Hom", zh: "紅磡" },
+        "旺角東": { en: "Mong Kok East", zh: "旺角東" },
+        "九龍塘": { en: "Kowloon Tong", zh: "九龍塘" },
+        "大圍": { en: "Tai Wai", zh: "大圍" },
+        "沙田": { en: "Sha Tin", zh: "沙田" },
+        "火炭": { en: "Fo Tan", zh: "火炭" },
+        "馬場": { en: "Racecourse", zh: "馬場" },
+        "大學": { en: "University", zh: "大學" },
+        "大埔墟": { en: "Tai Po Market", zh: "大埔墟" },
+        "太和": { en: "Tai Wo", zh: "太和" },
+        "粉嶺": { en: "Fanling", zh: "粉嶺" },
+        "上水": { en: "Sheung Shui", zh: "上水" },
+        "羅湖": { en: "Lo Wu", zh: "羅湖" },
+        "落馬洲": { en: "Lok Ma Chau", zh: "落馬洲" }
+    },
+    "屯馬綫": {
+        "屯門": { en: "Tuen Mun", zh: "屯門" },
+        "兆康": { en: "Siu Hong", zh: "兆康" },
+        "天水圍": { en: "Tin Shui Wai", zh: "天水圍" },
+        "朗屏": { en: "Long Ping", zh: "朗屏" },
+        "元朗": { en: "Yuen Long", zh: "元朗" },
+        "錦上路": { en: "Kam Sheung Road", zh: "錦上路" },
+        "荃灣西": { en: "Tsuen Wan West", zh: "荃灣西" },
+        "美孚": { en: "Mei Foo", zh: "美孚" },
+        "南昌": { en: "Nam Cheong", zh: "南昌" },
+        "柯士甸": { en: "Austin", zh: "柯士甸" },
+        "尖東": { en: "East Tsim Sha Tsui", zh: "尖東" },
+        "紅磡": { en: "Hung Hom", zh: "紅磡" },
+        "何文田": { en: "Ho Man Tin", zh: "何文田" },
+        "土瓜灣": { en: "To Kwa Wan", zh: "土瓜灣" },
+        "宋皇臺": { en: "Sung Wong Toi", zh: "宋皇臺" },
+        "啟德": { en: "Kai Tak", zh: "啟德" },
+        "鑽石山": { en: "Diamond Hill", zh: "鑽石山" },
+        "顯徑": { en: "Hin Keng", zh: "顯徑" },
+        "大圍": { en: "Tai Wai", zh: "大圍" },
+        "車公廟": { en: "Che Kung Temple", zh: "車公廟" },
+        "沙田圍": { en: "Sha Tin Wai", zh: "沙田圍" },
+        "第一城": { en: "City One", zh: "第一城" },
+        "石門": { en: "Shek Mun", zh: "石門" },
+        "大水坑": { en: "Tai Shui Hang", zh: "大水坑" },
+        "恆安": { en: "Heng On", zh: "恆安" },
+        "馬鞍山": { en: "Ma On Shan", zh: "馬鞍山" },
+        "烏溪沙": { en: "Wu Kai Sha", zh: "烏溪沙" }
+    },
+    "東涌綫": {
+        "香港": { en: "Hong Kong", zh: "香港" },
+        "九龍": { en: "Kowloon", zh: "九龍" },
+        "奧運": { en: "Olympic", zh: "奧運" },
+        "南昌": { en: "Nam Cheong", zh: "南昌" },
+        "荔景": { en: "Lai King", zh: "荔景" },
+        "青衣": { en: "Tsing Yi", zh: "青衣" },
+        "欣澳": { en: "Sunny Bay", zh: "欣澳" },
+        "東涌": { en: "Tung Chung", zh: "東涌" }
     }
-    stationSelect.value = selectedLine;
-}
+};
 
 const stationSelect = document.getElementById('station-select');
 const doorOpenBtn = document.getElementById('door-open');
@@ -77,28 +157,45 @@ const doorCloseBtn = document.getElementById('door-close');
 const concourseWalkBtn = document.getElementById('concourse-walk');
 const historyList = document.getElementById('history-list');
 const gpsStatus = document.getElementById('gps-status');
+const langSelect = document.getElementById('lang-select');
 
 let history = JSON.parse(localStorage.getItem('mtr_history')) || [];
+let currentLang = 'en';
 
 window.onload = function() {
     initStationSelect();
     renderHistory();
     detectLocation();
+    setLanguage(currentLang);
 };
 
+langSelect.addEventListener('change', (event) => {
+    currentLang = event.target.value;
+    setLanguage(currentLang);
+});
+
+function setLanguage(lang) {
+    document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.dataset[lang];
+    });
+    initStationSelect();
+}
+
 function initStationSelect() {
+    const selectedValue = stationSelect.value;
     stationSelect.innerHTML = '';
-    for (const [line, stations] of Object.entries(mtrLines)) {
+    for (const [line, stations] of Object.entries(mtrStations)) {
         const group = document.createElement('optgroup');
-        group.label = line;
-        stations.forEach(station => {
+        group.label = mtrLines[line][currentLang];
+        for (const [station, names] of Object.entries(stations)) {
             const option = document.createElement('option');
             option.value = station;
-            option.textContent = station;
+            option.textContent = names[currentLang];
             group.appendChild(option);
-        });
+        }
         stationSelect.appendChild(group);
     }
+    stationSelect.value = selectedValue;
 }
 
 // --- GPS ---
@@ -211,7 +308,7 @@ function renderHistory() {
             <div class="flex-1">
                 <div class="text-xs text-gray-400 mb-1">${log.date} ${log.time}</div>
                 <div class="font-bold text-gray-800 text-lg">
-                    ${log.station} - ${log.event}
+                    ${mtrStations[log.line][log.station][currentLang]} - ${log.event}
                 </div>
                 <div class="text-sm text-gray-600">
                     Location: ${log.location}
@@ -243,7 +340,7 @@ function downloadCSV() {
         let row = [
             log.date,
             log.time,
-            log.station,
+            mtrStations[log.line][log.station][currentLang],
             log.event,
             `"${log.location}"`
         ].join(",");
