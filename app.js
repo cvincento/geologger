@@ -157,6 +157,7 @@ const doorCloseBtn = document.getElementById('door-close');
 const concourseWalkBtn = document.getElementById('concourse-walk');
 const historyList = document.getElementById('history-list');
 const gpsStatus = document.getElementById('gps-status');
+const langSelect = document.getElementById('lang-select');
 const translations = {
     "Door Open": { en: "Door Open", zh: "開門" },
     "Door Close": { en: "Door Close", zh: "關門" },
