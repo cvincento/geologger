@@ -1,4 +1,3 @@
-// --- 1. 車站座標資料庫 ---
 const stationCoords = {
     "堅尼地城": [22.2811, 114.1264], "香港大學": [22.2842, 114.1362], "西營盤": [22.2863, 114.1415],
     "上環": [22.2874, 114.1517], "中環": [22.2819, 114.1582], "金鐘": [22.2794, 114.1645],
@@ -129,8 +128,8 @@ function deg2rad(deg) { return deg * (Math.PI/180) }
 // --- Event Logging ---
 function logEvent(event) {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
-    const dateString = now.toLocaleDateString('zh-HK');
+    const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const dateString = now.toLocaleDateString('en-US');
     const selectedStation = stationSelect.value;
 
     navigator.geolocation.getCurrentPosition(position => {
@@ -163,13 +162,13 @@ function logEvent(event) {
     });
 }
 
-doorOpenBtn.addEventListener('click', () => logEvent('Subway Door Open'));
-doorCloseBtn.addEventListener('click', () => logEvent('Subway Door Close'));
-concourseWalkBtn.addEventListener('click', () => logEvent('Station Concourse Walk'));
+doorOpenBtn.addEventListener('click', () => logEvent('Door Open'));
+doorCloseBtn.addEventListener('click', () => logEvent('Door Close'));
+concourseWalkBtn.addEventListener('click', () => logEvent('Concourse Walk'));
 
 function renderHistory() {
     if (history.length === 0) {
-        historyList.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">暫無紀錄</p>';
+        historyList.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">No records</p>';
         return;
     }
     historyList.innerHTML = history.map(log => `
@@ -188,17 +187,17 @@ function renderHistory() {
 }
 
 function clearHistory() {
-    if(confirm("確定要刪除所有歷史紀錄嗎？")) {
+    if(confirm("Are you sure you want to clear all history?")) {
         history = [];
         localStorage.removeItem('mtr_history');
         renderHistory();
     }
 }
 
-// --- CSV 匯出功能 ---
+// --- CSV Export ---
 function downloadCSV() {
     if (history.length === 0) {
-        alert("暫時沒有歷史紀錄可以匯出！");
+        alert("No history to export!");
         return;
     }
 
