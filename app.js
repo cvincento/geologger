@@ -273,7 +273,14 @@ function logEvent(event) {
 
     const selectedOption = stationSelect.options[stationSelect.selectedIndex];
     const lineLabel = selectedOption.parentNode.label;
-    const lineKey = Object.keys(mtrLines).find(key => mtrLines[key][currentLang] === lineLabel);
+    const lineKey = Object.keys(mtrLines).find(key => {
+        for (const station in mtrStations[key]) {
+            if (station === selectedStation) {
+                return true;
+            }
+        }
+        return false;
+    });
 
     navigator.geolocation.getCurrentPosition(position => {
         const lat = position.coords.latitude.toFixed(6);
