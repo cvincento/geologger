@@ -155,6 +155,8 @@ const stationSelect = document.getElementById('station-select');
 const doorOpenBtn = document.getElementById('door-open');
 const doorCloseBtn = document.getElementById('door-close');
 const concourseWalkBtn = document.getElementById('concourse-walk');
+const remarkInput = document.getElementById('remark-input');
+const logRemarkBtn = document.getElementById('log-remark');
 const historyList = document.getElementById('history-list');
 const gpsStatus = document.getElementById('gps-status');
 const langSelect = document.getElementById('lang-select');
@@ -282,7 +284,8 @@ function logEvent(event) {
             time: timeString,
             station: mtrStations[lineKey][selectedStation],
             event: event,
-            location: `${lat}, ${lon}`
+            location: `${lat}, ${lon}`,
+            remark: remarkInput.value
         };
 
         history.unshift(logEntry);
@@ -306,6 +309,13 @@ function logEvent(event) {
 doorOpenBtn.addEventListener('click', () => logEvent('Door Open'));
 doorCloseBtn.addEventListener('click', () => logEvent('Door Close'));
 concourseWalkBtn.addEventListener('click', () => logEvent('Concourse Walk'));
+logRemarkBtn.addEventListener('click', () => {
+    const remark = remarkInput.value;
+    if (remark) {
+        logEvent(remark);
+        remarkInput.value = '';
+    }
+});
 
 function renderHistory() {
     if (history.length === 0) {
@@ -343,15 +353,16 @@ function downloadCSV() {
     }
 
     let csvContent = "\uFEFF";
-    csvContent += "Date,Time,Station,Event,Location\n";
+    csvContent += "Date,Time,Station,Event,Location,Remark\n";
 
     history.forEach(log => {
         let row = [
             log.date,
             log.time,
             log.station[currentLang],
-            translations[log.event][currentLang],
-            `"${log.location}"`
+            translations[log.event] ? translations[log.event][currentLang] : log.event,
+            `"${log.location}"`,
+            `"${log.remark || ''}"`
         ].join(",");
         csvContent += row + "\n";
     });
