@@ -327,10 +327,13 @@ function renderHistory() {
             <div class="flex-1">
                 <div class="text-xs text-gray-400 mb-1">${log.date} ${log.time}</div>
                 <div class="font-bold text-gray-800 text-lg">
-                    ${log.station[currentLang]} - ${translations[log.event][currentLang]}
+                    ${log.station[currentLang]} - ${translations[log.event] ? translations[log.event][currentLang] : log.event}
                 </div>
                 <div class="text-sm text-gray-600">
                     Location: ${log.location}
+                </div>
+                <div class="text-sm text-gray-500 mt-1">
+                    Remark: ${log.remark || ''}
                 </div>
             </div>
         </div>
