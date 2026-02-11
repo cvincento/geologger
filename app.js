@@ -304,7 +304,8 @@ function logEvent(event) {
             time: timeString,
             station: selectedStation,
             event: event,
-            location: 'Not available'
+            location: 'Not available',
+            remark: remarkInput.value
         };
 
         history.unshift(logEntry);
