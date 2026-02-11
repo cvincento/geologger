@@ -27,14 +27,49 @@ const stationCoords = {
 };
 
 const mtrLines = {
-    "常用": ["旺角", "中環", "金鐘", "銅鑼灣", "尖沙咀", "九龍塘"],
-    "港島綫": ["堅尼地城", "香港大學", "西營盤", "上環", "中環", "金鐘", "灣仔", "銅鑼灣", "天后", "炮台山", "北角", "鰂魚涌", "太古", "西灣河", "筲箕灣", "杏花邨", "柴灣"],
-    "荃灣綫": ["中環", "金鐘", "尖沙咀", "佐敦", "油麻地", "旺角", "太子", "深水埗", "長沙灣", "荔枝角", "美孚", "荔景", "葵芳", "葵興", "大窩口", "荃灣"],
-    "觀塘綫": ["黃埔", "何文田", "油麻地", "旺角", "太子", "石硤尾", "九龍塘", "樂富", "黃大仙", "鑽石山", "彩虹", "九龍灣", "牛頭角", "觀塘", "藍田", "油塘", "調景嶺"],
-    "東鐵綫": ["金鐘", "會展", "紅磡", "旺角東", "九龍塘", "大圍", "沙田", "火炭", "馬場", "大學", "大埔墟", "太和", "粉嶺", "上水", "羅湖", "落馬洲"],
-    "屯馬綫": ["屯門", "兆康", "天水圍", "朗屏", "元朗", "錦上路", "荃灣西", "美孚", "南昌", "柯士甸", "尖東", "紅磡", "何文田", "土瓜灣", "宋皇臺", "啟德", "鑽石山", "顯徑", "大圍", "車公廟", "沙田圍", "第一城", "石門", "大水坑", "恆安", "馬鞍山", "烏溪沙"],
-    "東涌綫": ["香港", "九龍", "奧運", "南昌", "荔景", "青衣", "欣澳", "東涌"]
+    "常用": { en: "Common", zh: "常用" },
+    "港島綫": { en: "Island Line", zh: "港島綫" },
+    "荃灣綫": { en: "Tsuen Wan Line", zh: "荃灣綫" },
+    "觀塘綫": { en: "Kwun Tong Line", zh: "觀塘綫" },
+    "東鐵綫": { en: "East Rail Line", zh: "東鐵綫" },
+    "屯馬綫": { en: "Tuen Ma Line", zh: "屯馬綫" },
+    "東涌綫": { en: "Tung Chung Line", zh: "東涌綫" }
 };
+
+const langSelect = document.getElementById('lang-select');
+
+langSelect.addEventListener('change', (event) => {
+    setLanguage(event.target.value);
+});
+
+function setLanguage(lang) {
+    document.querySelectorAll('[data-en]').forEach(el => {
+        el.textContent = el.dataset[lang];
+    });
+    updateStationSelect(lang);
+}
+
+function updateStationSelect(lang) {
+    const selectedLine = stationSelect.value;
+    stationSelect.innerHTML = '';
+    for (const [line, names] of Object.entries(mtrLines)) {
+        const group = document.createElement('optgroup');
+        group.label = names[lang];
+        // This part needs to be updated to handle station names in different languages
+        // For now, we'll just use the Chinese names
+        const stations = mtrStations[line];
+        if (stations) {
+            stations.forEach(station => {
+                const option = document.createElement('option');
+                option.value = station;
+                option.textContent = station;
+                group.appendChild(option);
+            });
+        }
+        stationSelect.appendChild(group);
+    }
+    stationSelect.value = selectedLine;
+}
 
 const stationSelect = document.getElementById('station-select');
 const doorOpenBtn = document.getElementById('door-open');
