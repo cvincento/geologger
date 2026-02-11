@@ -37,31 +37,19 @@ const mtrLines = {
     "東涌綫": ["香港", "九龍", "奧運", "南昌", "荔景", "青衣", "欣澳", "東涌"]
 };
 
-let isInside = false;
-let currentTrip = {};
-let history = JSON.parse(localStorage.getItem('mtr_history')) || [];
-
-const statusDisplay = document.getElementById('status-display');
-const actionBtn = document.getElementById('action-btn');
-const currentTripInfo = document.getElementById('current-trip-info');
-const infoEntryStation = document.getElementById('info-entry-station');
-const infoEntryTime = document.getElementById('info-entry-time');
-const historyList = document.getElementById('history-list');
-const stationModal = document.getElementById('station-modal');
 const stationSelect = document.getElementById('station-select');
-const modalTitle = document.getElementById('modal-title');
-const locationMsg = document.getElementById('location-msg');
+const doorOpenBtn = document.getElementById('door-open');
+const doorCloseBtn = document.getElementById('door-close');
+const concourseWalkBtn = document.getElementById('concourse-walk');
+const historyList = document.getElementById('history-list');
 const gpsStatus = document.getElementById('gps-status');
+
+let history = JSON.parse(localStorage.getItem('mtr_history')) || [];
 
 window.onload = function() {
     initStationSelect();
-    const savedTrip = localStorage.getItem('mtr_current_trip');
-    if (savedTrip) {
-        currentTrip = JSON.parse(savedTrip);
-        isInside = true;
-        updateUI(true);
-    }
     renderHistory();
+    detectLocation();
 };
 
 function initStationSelect() {
@@ -79,24 +67,14 @@ function initStationSelect() {
     }
 }
 
-function openStationModal() {
-    modalTitle.textContent = isInside ? "請選擇出閘車站" : "請選擇入閘車站";
-    stationModal.classList.remove('hidden');
-    detectLocation();
-}
-
-function closeModal() {
-    stationModal.classList.add('hidden');
-    locationMsg.innerHTML = '';
-}
-
 // --- GPS ---
 function detectLocation() {
     if (!navigator.geolocation) {
-        locationMsg.innerHTML = '<span class="text-red-500">瀏覽器不支持定位</span>';
+        gpsStatus.textContent = "GPS Not Supported";
+        gpsStatus.classList.add('bg-red-600');
         return;
     }
-    locationMsg.innerHTML = '<div class="loader mr-2"></div><span class="text-blue-500">正在搜尋最近車站...</span>';
+    gpsStatus.textContent = "Locating...";
 
     navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -106,18 +84,17 @@ function detectLocation() {
             
             if (nearest) {
                 stationSelect.value = nearest.name;
-                locationMsg.innerHTML = `<span class="text-green-600 font-bold"><i class="fas fa-map-marker-alt"></i> 最近: ${nearest.name} (${nearest.distance.toFixed(2)}km)</span>`;
-                gpsStatus.textContent = "GPS 已定位";
+                gpsStatus.textContent = "GPS Locked";
                 gpsStatus.classList.replace('bg-blue-800', 'bg-green-600');
             } else {
-                locationMsg.innerHTML = '<span class="text-orange-500">找不到附近的車站數據</span>';
+                gpsStatus.textContent = "No Station Nearby";
+                gpsStatus.classList.add('bg-orange-500');
             }
         },
         (error) => {
             console.error(error);
-            locationMsg.innerHTML = '<span class="text-red-500">無法獲取位置 (請允許權限)</span>';
-            gpsStatus.textContent = "GPS 失敗";
-            gpsStatus.classList.replace('bg-blue-800', 'bg-red-600');
+            gpsStatus.textContent = "GPS Error";
+            gpsStatus.classList.add('bg-red-600');
         },
         { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     );
@@ -149,83 +126,61 @@ function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
 
 function deg2rad(deg) { return deg * (Math.PI/180) }
 
-// --- 核心邏輯 ---
-function confirmAction() {
-    const selectedStation = stationSelect.value;
+// --- Event Logging ---
+function logEvent(event) {
     const now = new Date();
     const timeString = now.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
     const dateString = now.toLocaleDateString('zh-HK');
+    const selectedStation = stationSelect.value;
 
-    if (!isInside) {
-        currentTrip = {
+    navigator.geolocation.getCurrentPosition(position => {
+        const lat = position.coords.latitude.toFixed(6);
+        const lon = position.coords.longitude.toFixed(6);
+
+        const logEntry = {
             date: dateString,
-            entryStation: selectedStation,
-            entryTime: timeString,
-            entryTimestamp: now.getTime()
-        };
-        localStorage.setItem('mtr_current_trip', JSON.stringify(currentTrip));
-        isInside = true;
-        updateUI(true);
-    } else {
-        const durationMs = now.getTime() - currentTrip.entryTimestamp;
-        const durationMin = Math.floor(durationMs / 60000);
-
-        const completeTrip = {
-            ...currentTrip,
-            exitStation: selectedStation,
-            exitTime: timeString,
-            duration: durationMin
+            time: timeString,
+            station: selectedStation,
+            event: event,
+            location: `${lat}, ${lon}`
         };
 
-        history.unshift(completeTrip);
+        history.unshift(logEntry);
         localStorage.setItem('mtr_history', JSON.stringify(history));
-        
-        localStorage.removeItem('mtr_current_trip');
-        currentTrip = {};
-        isInside = false;
-        updateUI(false);
         renderHistory();
-    }
-    closeModal();
+    }, () => {
+        const logEntry = {
+            date: dateString,
+            time: timeString,
+            station: selectedStation,
+            event: event,
+            location: 'Not available'
+        };
+
+        history.unshift(logEntry);
+        localStorage.setItem('mtr_history', JSON.stringify(history));
+        renderHistory();
+    });
 }
 
-function updateUI(inside) {
-    if (inside) {
-        actionBtn.classList.replace('bg-green-500', 'bg-orange-500');
-        actionBtn.classList.replace('border-green-200', 'border-orange-200');
-        actionBtn.innerHTML = `<div><i class="fas fa-sign-out-alt mb-2 text-3xl"></i></div><span>出閘</span>`;
-        statusDisplay.innerHTML = `當前狀態: <span class="text-orange-500 font-bold">已入閘</span>`;
-        infoEntryStation.textContent = currentTrip.entryStation;
-        infoEntryTime.textContent = currentTrip.entryTime;
-        currentTripInfo.classList.remove('hidden');
-    } else {
-        actionBtn.classList.replace('bg-orange-500', 'bg-green-500');
-        actionBtn.classList.replace('border-orange-200', 'border-green-200');
-        actionBtn.innerHTML = `<div><i class="fas fa-sign-in-alt mb-2 text-3xl"></i></div><span>入閘</span>`;
-        statusDisplay.innerHTML = `當前狀態: <span class="text-gray-500">未入閘</span>`;
-        currentTripInfo.classList.add('hidden');
-    }
-}
+doorOpenBtn.addEventListener('click', () => logEvent('Subway Door Open'));
+doorCloseBtn.addEventListener('click', () => logEvent('Subway Door Close'));
+concourseWalkBtn.addEventListener('click', () => logEvent('Station Concourse Walk'));
 
 function renderHistory() {
     if (history.length === 0) {
         historyList.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">暫無紀錄</p>';
         return;
     }
-    historyList.innerHTML = history.map(trip => `
+    historyList.innerHTML = history.map(log => `
         <div class="bg-white p-3 rounded shadow-sm border-l-4 border-blue-500 flex justify-between items-center mr-1">
             <div class="flex-1">
-                <div class="text-xs text-gray-400 mb-1">${trip.date}</div>
+                <div class="text-xs text-gray-400 mb-1">${log.date} ${log.time}</div>
                 <div class="font-bold text-gray-800 text-lg">
-                    ${trip.entryStation} <i class="fas fa-arrow-right text-xs text-gray-400 mx-1"></i> ${trip.exitStation}
+                    ${log.station} - ${log.event}
                 </div>
                 <div class="text-sm text-gray-600">
-                    ${trip.entryTime} - ${trip.exitTime}
-                </div>
-            </div>
-            <div class="text-right pl-2">
-                <div class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 font-mono whitespace-nowrap">
-                    ${trip.duration} 分鐘
+                    Location: ${log.location}
                 </div>
             </div>
         </div>
@@ -247,34 +202,28 @@ function downloadCSV() {
         return;
     }
 
-    // 1. 定義 CSV 標頭
-    let csvContent = "\uFEFF"; // 加入 BOM 讓 Excel 識別中文
-    csvContent += "日期,入閘車站,入閘時間,出閘車站,出閘時間,耗時(分鐘)\n";
+    let csvContent = "\uFEFF";
+    csvContent += "Date,Time,Station,Event,Location\n";
 
-    // 2. 將歷史紀錄轉為 CSV 格式
-    history.forEach(trip => {
+    history.forEach(log => {
         let row = [
-            trip.date,
-            trip.entryStation,
-            trip.entryTime,
-            trip.exitStation,
-            trip.exitTime,
-            trip.duration
+            log.date,
+            log.time,
+            log.station,
+            log.event,
+            `"${log.location}"`
         ].join(",");
         csvContent += row + "\n";
     });
 
-    // 3. 建立下載連結
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     
-    // 4. 設定檔名 (加入當前日期)
     const today = new Date().toISOString().slice(0, 10);
     link.setAttribute("href", url);
-    link.setAttribute("download", `mtr_history_${today}.csv`);
+    link.setAttribute("download", `mtr_log_${today}.csv`);
     
-    // 5. 觸發下載
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

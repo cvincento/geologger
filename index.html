@@ -18,18 +18,25 @@
         </div>
 
         <div class="p-6 flex flex-col items-center justify-center space-y-4">
-            <div id="status-display" class="text-gray-500 font-medium mb-2">
-                當前狀態: <span class="text-red-500">未入閘</span>
+            <div class="buttons grid grid-cols-3 gap-4 w-full">
+                <button id="door-open" class="btn-main p-4 rounded-lg text-white text-lg font-bold shadow-lg flex flex-col items-center justify-center">
+                    <i class="fas fa-door-open mb-2 text-2xl"></i>
+                    <span>Door Open</span>
+                </button>
+                <button id="door-close" class="btn-main p-4 rounded-lg text-white text-lg font-bold shadow-lg flex flex-col items-center justify-center">
+                    <i class="fas fa-door-closed mb-2 text-2xl"></i>
+                    <span>Door Close</span>
+                </button>
+                <button id="concourse-walk" class="btn-main p-4 rounded-lg text-white text-lg font-bold shadow-lg flex flex-col items-center justify-center">
+                    <i class="fas fa-walking mb-2 text-2xl"></i>
+                    <span>Concourse Walk</span>
+                </button>
             </div>
 
-            <button id="action-btn" onclick="openStationModal()" class="btn-main w-40 h-40 rounded-full bg-green-500 text-white text-2xl font-bold shadow-lg flex flex-col items-center justify-center border-4 border-green-200">
-                <div><i class="fas fa-sign-in-alt mb-2 text-3xl"></i></div>
-                <span>入閘</span>
-            </button>
-
             <div id="current-trip-info" class="hidden w-full bg-blue-50 p-3 rounded-lg text-sm text-blue-800 mt-4 border border-blue-100">
-                <p>📍 入站: <span id="info-entry-station" class="font-bold">--</span></p>
-                <p>🕒 時間: <span id="info-entry-time">--</span></p>
+                <p>📍 Station: <span id="info-station" class="font-bold">--</span></p>
+                <p>🕒 Time: <span id="info-time">--</span></p>
+                <p>🛰️ Location: <span id="info-location">--</span></p>
             </div>
         </div>
 
