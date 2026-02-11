@@ -271,8 +271,7 @@ function logEvent(event) {
         const logEntry = {
             date: dateString,
             time: timeString,
-            line: stationSelect.options[stationSelect.selectedIndex].parentNode.label,
-            station: selectedStation,
+            station: mtrStations[stationSelect.options[stationSelect.selectedIndex].parentNode.label.split(' ')[0]][selectedStation],
             event: event,
             location: `${lat}, ${lon}`
         };
@@ -309,7 +308,7 @@ function renderHistory() {
             <div class="flex-1">
                 <div class="text-xs text-gray-400 mb-1">${log.date} ${log.time}</div>
                 <div class="font-bold text-gray-800 text-lg">
-                    ${log.station} - ${log.event}
+                    ${log.station[currentLang]} - ${log.event}
                 </div>
                 <div class="text-sm text-gray-600">
                     Location: ${log.location}
@@ -341,7 +340,7 @@ function downloadCSV() {
         let row = [
             log.date,
             log.time,
-            log.station,
+            log.station[currentLang],
             log.event,
             `"${log.location}"`
         ].join(",");
