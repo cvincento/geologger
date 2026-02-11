@@ -1,38 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geo Logger</title>
+    <title>MTR 智能記錄器 (GPS+CSV)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <h1>Geo Logger</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-6 px-4">
 
-    <div class="container">
-        <div class="selection">
-            <label for="line-select">Select MTR Line:</label>
-            <select id="line-select"></select>
-        </div>
-        <div class="selection">
-            <label for="station-select">Select Station:</label>
-            <select id="station-select"></select>
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden relative">
+        
+        <div class="bg-blue-900 p-4 text-white text-center flex justify-between items-center">
+            <h1 class="text-xl font-bold"><i class="fas fa-satellite-dish mr-2"></i>MTR GPS</h1>
+            <div class="text-xs bg-blue-800 px-2 py-1 rounded" id="gps-status">GPS 待機</div>
         </div>
 
-        <div class="buttons">
-            <button id="door-open">Subway Door Open</button>
-            <button id="door-close">Subway Door Close</button>
-            <button id="concourse-walk">Station Concourse Walk</button>
+        <div class="p-6 flex flex-col items-center justify-center space-y-4">
+            <div id="status-display" class="text-gray-500 font-medium mb-2">
+                當前狀態: <span class="text-red-500">未入閘</span>
+            </div>
+
+            <button id="action-btn" onclick="openStationModal()" class="btn-main w-40 h-40 rounded-full bg-green-500 text-white text-2xl font-bold shadow-lg flex flex-col items-center justify-center border-4 border-green-200">
+                <div><i class="fas fa-sign-in-alt mb-2 text-3xl"></i></div>
+                <span>入閘</span>
+            </button>
+
+            <div id="current-trip-info" class="hidden w-full bg-blue-50 p-3 rounded-lg text-sm text-blue-800 mt-4 border border-blue-100">
+                <p>📍 入站: <span id="info-entry-station" class="font-bold">--</span></p>
+                <p>🕒 時間: <span id="info-entry-time">--</span></p>
+            </div>
         </div>
 
-        <div id="location">
-            <p>Location: <span id="lat"></span>, <span id="lon"></span></p>
+        <div class="bg-gray-50 p-4 border-t border-gray-200 h-80 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-700">歷史紀錄</h2>
+                <div class="flex space-x-3">
+                    <!-- 新增 CSV 下載按鈕 -->
+                    <button onclick="downloadCSV()" class="text-xs text-green-600 hover:text-green-800 font-bold flex items-center">
+                        <i class="fas fa-file-csv mr-1"></i>匯出 CSV
+                    </button>
+                    <button onclick="clearHistory()" class="text-xs text-red-500 hover:text-red-700 underline">清除</button>
+                </div>
+            </div>
+            
+            <div class="overflow-y-auto flex-1 space-y-3 no-scrollbar" id="history-list">
+                <p class="text-center text-gray-400 text-sm py-4">暫無紀錄</p>
+            </div>
         </div>
 
-        <div id="log">
-            <h2>Log</h2>
-            <pre id="log-data"></pre>
+        <!-- 彈出式選站視窗 -->
+        <div id="station-modal" class="hidden absolute inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center transition-opacity duration-300">
+            <div class="bg-white w-full sm:w-5/6 rounded-t-2xl sm:rounded-xl p-6 shadow-2xl transform transition-transform duration-300">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800" id="modal-title">請選擇車站</h3>
+                    <button onclick="detectLocation()" class="text-blue-600 text-sm flex items-center">
+                        <i class="fas fa-location-arrow mr-1"></i> 重新定位
+                    </button>
+                </div>
+
+                <div id="location-msg" class="mb-2 text-xs text-gray-500 h-5 flex items-center"></div>
+                
+                <div class="relative mb-6">
+                    <select id="station-select" class="block w-full p-3 bg-gray-50 border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                        <!-- 選項由 JS 生成 -->
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button onclick="closeModal()" class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-bold hover:bg-gray-300">取消</button>
+                    <button onclick="confirmAction()" class="flex-1 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 shadow-lg">確認</button>
+                </div>
+            </div>
         </div>
+
     </div>
 
     <script src="app.js"></script>

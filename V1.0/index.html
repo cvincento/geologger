@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Logger</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Geo Logger</h1>
+
+    <div class="container">
+        <div class="selection">
+            <label for="line-select">Select MTR Line:</label>
+            <select id="line-select"></select>
+        </div>
+        <div class="selection">
+            <label for="station-select">Select Station:</label>
+            <select id="station-select"></select>
+        </div>
+
+        <div class="buttons">
+            <button id="door-open">Subway Door Open</button>
+            <button id="door-close">Subway Door Close</button>
+            <button id="concourse-walk">Station Concourse Walk</button>
+        </div>
+
+        <div id="location">
+            <p>Location: <span id="lat"></span>, <span id="lon"></span></p>
+        </div>
+
+        <div id="log">
+            <h2>Log</h2>
+            <pre id="log-data"></pre>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
