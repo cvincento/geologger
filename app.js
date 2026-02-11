@@ -264,6 +264,10 @@ function logEvent(event) {
     const dateString = now.toLocaleDateString('en-US');
     const selectedStation = stationSelect.value;
 
+    const selectedOption = stationSelect.options[stationSelect.selectedIndex];
+    const lineLabel = selectedOption.parentNode.label;
+    const lineKey = Object.keys(mtrLines).find(key => mtrLines[key][currentLang] === lineLabel);
+
     navigator.geolocation.getCurrentPosition(position => {
         const lat = position.coords.latitude.toFixed(6);
         const lon = position.coords.longitude.toFixed(6);
@@ -271,7 +275,7 @@ function logEvent(event) {
         const logEntry = {
             date: dateString,
             time: timeString,
-            station: mtrStations[stationSelect.options[stationSelect.selectedIndex].parentNode.label.split(' ')[0]][selectedStation],
+            station: mtrStations[lineKey][selectedStation],
             event: event,
             location: `${lat}, ${lon}`
         };
